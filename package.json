@@ -1,0 +1,47 @@
+{
+	"name": "g11n-langneg",
+	"version": "0.0.1",
+	"description": "Language negotiation for the masses",
+	"main": "index.js",
+	"scripts": {
+		"prepublish": "npm run validate",
+		"after-success": "tradeshift-scripts travis-after-success",
+		"build": "tsc --downlevelIteration",
+		"format": "tradeshift-scripts format",
+		"lint": "tradeshift-scripts lint",
+		"precommit": "tradeshift-scripts precommit",
+		"test:ci": "tradeshift-scripts test --coverage",
+		"test": "tradeshift-scripts test",
+		"validate": "tradeshift-scripts validate"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Tradeshift/g11n-langneg.git"
+	},
+	"keywords": [
+		"globalization",
+		"g11n",
+		"langneg",
+		"bcp47"
+	],
+	"author": "Globalization Team",
+	"bugs": {
+		"url": "https://github.com/Tradeshift/g11n-langneg/issues"
+	},
+	"homepage": "https://github.com/Tradeshift/g11n-langneg#readme",
+	"devDependencies": {
+		"@types/jest": "^24.0.25",
+		"cz-conventional-changelog": "^3.0.2",
+		"tradeshift-scripts": "^2.7.2",
+		"typescript": "^3.7.4"
+	},
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-conventional-changelog"
+		}
+	},
+	"dependencies": {
+		"axios": "^0.19.2",
+		"bcp-47": "^1.0.7"
+	}
+}

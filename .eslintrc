@@ -1,0 +1,7 @@
+{
+	"ignorePatterns": ["/dist"],
+	"extends": "./node_modules/tradeshift-scripts/eslint.js",
+	"rules": {
+		"no-unexpected-multiline": "off"
+	}
+}

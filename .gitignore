@@ -1,0 +1,10 @@
+.DS_STORE
+.eslintcache
+.idea
+.vscode
+build/*
+coverage/*
+dist/*
+node_modules
+npm-debug.log
+resources/
