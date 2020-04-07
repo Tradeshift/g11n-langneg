@@ -62,7 +62,13 @@ export class Locale {
 		return new Locale(locale);
 	}
 
-	constructor(locale: string = defaultLocale) {
+	constructor(locale: Locale);
+	constructor(locale: string);
+	constructor(locale) {
+		if (locale instanceof Locale) {
+			return locale;
+		}
+
 		const defaultParsedLocale = parse(defaultLocale);
 
 		if (typeof locale !== 'string' || locale === '') {

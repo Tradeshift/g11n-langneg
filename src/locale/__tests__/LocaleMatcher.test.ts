@@ -23,7 +23,7 @@ describe('LocaleMatcher', () => {
 			expect(negotiatePreferRegion(locale, candidates)).toEqual(new Locale('da'));
 		});
 
-		it('prefers localees with more specific regions, if available', () => {
+		it('prefers locales with more specific regions, if available', () => {
 			let locale = new Locale('und-BR');
 			let candidates = [new Locale('en-BR'), new Locale('pt')];
 			expect(negotiatePreferRegion(locale, candidates)).toEqual(new Locale('en-BR'));
@@ -35,6 +35,16 @@ describe('LocaleMatcher', () => {
 			locale = new Locale('und-BR');
 			candidates = [new Locale('en'), new Locale('pt')];
 			expect(negotiatePreferRegion(locale, candidates)).toEqual(Locale.ROOT);
+		});
+
+		it('also accepts plain strings as input', () => {
+			let locale = 'und-BR';
+			let candidates = ['en', 'pt-Latn-BR'];
+			expect(negotiatePreferRegion(locale, candidates)).toEqual(new Locale('pt-Latn-BR'));
+
+			locale = 'pt';
+			candidates = ['es', 'pt-Latn-BR'];
+			expect(negotiatePreferRegion(locale, candidates)).toEqual(new Locale('pt-Latn-BR'));
 		});
 	});
 
@@ -99,6 +109,16 @@ describe('LocaleMatcher', () => {
 			locale = new Locale('en-DE-u-co-phonebk');
 			candidates = [new Locale('es'), new Locale('da'), new Locale('en')];
 			expect(negotiate(locale, candidates)).toEqual(new Locale('en'));
+		});
+
+		it('also accepts plain strings as input', () => {
+			let locale = 'pt';
+			let candidates = ['da', 'es', 'pt'];
+			expect(negotiate(locale, candidates)).toEqual(new Locale('pt'));
+
+			locale = 'pt';
+			candidates = ['es', 'pt-Latn-BR'];
+			expect(negotiate(locale, candidates)).toEqual(new Locale('pt-Latn-BR'));
 		});
 	});
 });

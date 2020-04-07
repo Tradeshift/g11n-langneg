@@ -10,7 +10,12 @@ class LocaleMatcher {
 	 *
 	 * @return the best locale or new Locale('und')
 	 */
-	public static negotiatePreferRegion(key: Locale, candidates: Array<Locale>): Locale {
+	public static negotiatePreferRegion(key: Locale, candidates: Array<Locale>): Locale;
+	public static negotiatePreferRegion(key: string, candidates: Array<string>): Locale;
+	public static negotiatePreferRegion(key, candidates): Locale {
+		key = new Locale(key);
+		candidates = candidates.map(c => new Locale(c));
+
 		const results = [
 			LocaleMatcher.getDirectMatch(key, candidates),
 			LocaleMatcher.getRegionMatch(key, candidates),
@@ -39,7 +44,12 @@ class LocaleMatcher {
 	 *
 	 * @return the best locale or new Locale('und')
 	 */
-	public static negotiate(key: Locale, candidates: Array<Locale>): Locale {
+	public static negotiate(key: Locale, candidates: Array<Locale>): Locale;
+	public static negotiate(key: string, candidates: Array<string>): Locale;
+	public static negotiate(key, candidates): Locale {
+		key = new Locale(key);
+		candidates = candidates.map(c => new Locale(c));
+
 		const candidatesWithDefault = [...candidates, Locale.ROOT];
 		const everyKey = LocaleMatcher.getSplitLocales([key]);
 
