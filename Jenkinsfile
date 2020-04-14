@@ -11,64 +11,78 @@
 pipeline {
     agent any // Or you could make the whole job or certain stages run inside docker
     triggers {
-        issueCommentTrigger('^(retest|docker push)$')
+        issueCommentTrigger('^(retest|npm publish)$')
     }
+    
     options {
         ansiColor('xterm')
         timestamps()
         timeout(time: 60, unit: 'MINUTES') // Kill the job if it gets stuck for too long
     }
-    // For Java people
-    // tools {
-    //    jdk 'oracle-java10.0.1-jdk'
-    //    maven 'apache-maven-3.5.0'
-    // }
-    // environment {
-    //     P12_PASSWORD = credentials 'client-cert-password'
-    //     MAVEN_OPTS = "-Djavax.net.ssl.keyStore=/var/lib/jenkins/.m2/certs/jenkins.p12 \
-    //                   -Djavax.net.ssl.keyStoreType=pkcs12 \
-    //                   -Djavax.net.ssl.keyStorePassword=$P12_PASSWORD"
-    // }
 
     stages {
+        stage('Initialise PR') {
+            when { changeRequest() }
+            steps {
+                githubNotify(status: 'PENDING', context: 'semantic-release', description: 'Not analysed')
+            }
+        }
+
         stage('Clone') {
             steps {
                 checkout scm
             }
         }
-        // stage('Compile') {
-        //    steps {
-        //        // Whatever it takes to compile your code
-        //        // sh 'mvn compile'
-        //    }
-        // }
 
-        // If you are deploying your service to Kubernetes, uncomment the following stage to make sure your Helm charts are validated before merging
-        // stage('Helm Check') {
-        //    steps {
-        //        helmCheck()
-        //    }
-        // }
+        stage('Setup nodejs') {
+            steps {
+                useNodeJS()
+            }
+        }
 
-        // Keeping the different phases separate will give you per-phase statistics and a nicer overall structure
-        // stage('Test') {
-        //     steps {
-        //         sh 'mvn test'
-        //     }
-        // }
+        stage('npm install') {
+            steps {
+                sh 'which node; node -v'
+                sh 'which npm; npm -v'
+                sh 'npm install'
+            }
+        }
 
-        // stage('Docker') {
-        //     when {
-        //         anyOf {
-        //             branch 'master'
-        //             expression { getTriggerText() == 'docker push' } // Push PRs docker image only when requested
-        //         }
-        //     }
-        //     steps {
-        //         // TODO: Build image somehow
-        //         dockerPush()
-        //     }
-        // }
+        stage('Build and test') {
+            steps {
+                sh "npm run validate"
+            }
+            post {
+                always {
+                    checkstyle pattern:'build/checkstyle/*.xml', unstableTotalAll: '0', usePreviousBuildAsReference: true
+                    junit testResults: 'build/junit/*.xml', allowEmptyResults: true
+                }
+            }
+        }
+
+        stage('npm publish') {
+            when {
+                changeRequest()
+                expression { return pullRequest.comments.any { it.body == 'npm publish' } }
+            }
+            environment {
+                NPM_TOKEN = credentials 'tradeshiftci-npm-readwrite-token'
+                NPM_CONFIG_REGISTRY = 'https://npm.pkg.github.com/'
+            }
+            steps {
+                npmPublish()
+            }
+        }
+
+        stage('Semantic release') {
+            environment {
+                NPM_TOKEN = credentials 'tradeshiftci-npm-readwrite-token'
+                NPM_CONFIG_REGISTRY = 'https://npm.pkg.github.com/'
+            }
+            steps {
+                semanticVersion()
+            }
+        }
 
         stage('Sonarqube') {
             // If you use Typescript

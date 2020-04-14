@@ -1,5 +1,5 @@
 {
-	"name": "g11n-langneg",
+	"name": "@tradeshift/g11n-langneg",
 	"version": "0.0.1",
 	"description": "Language negotiation for the masses",
 	"main": "index.js",
