@@ -21,52 +21,86 @@ describe('Locale', () => {
 		...languageVariantLocales
 	];
 
-	describe('instantiation', () => {
-		it('defaults to "und" when instantiating with no params', async () => {
-			expect(new Locale().toString()).toBe('und');
+	describe('parsing (strict and lenient)', () => {
+		it('superfluous content tags (throws error on strict mode)', () => {
+			['xx-YY-w-ZZZZZ---', 'aa---BB', 'aa-BB-!'].forEach(tag => {
+				expect(() => Locale.parseStrict(tag)).toThrow('Found superfluous content after tag');
+
+				expect(() => Locale.parse(tag)).not.toThrow();
+				expect(Locale.parse(tag).toString()).toBe(Locale.rootLocale.toString());
+			});
+		});
+
+		it('too many subtags (throws error on strict mode)', () => {
+			['aa-bbb-ccc-ddd-eee'].forEach(tag => {
+				expect(() => Locale.parseStrict(tag)).toThrow(
+					'Too many extended language subtags, expected at most 3 subtags'
+				);
+
+				expect(() => Locale.parse(tag)).not.toThrow();
+				expect(Locale.parse(tag).toString()).toBe(Locale.rootLocale.toString());
+			});
+		});
+
+		it('too long extension (throws error on strict mode)', () => {
+			['en-i-abcdefghi'].forEach(tag => {
+				expect(() => Locale.parseStrict(tag)).toThrow(
+					'Too long extension, expected at most 8 characters'
+				);
+
+				expect(() => Locale.parse(tag)).not.toThrow();
+				expect(Locale.parse(tag).toString()).toBe(Locale.rootLocale.toString());
+			});
 		});
 	});
-
 	describe('toString()', () => {
-		it('new Locale() stringifies to input locale', async () => {
+		it('parsing stringifies to input locale', async () => {
 			everyLocale.forEach(locale => {
-				const l = new Locale(locale);
-				expect(l.toString()).toBe(locale);
+				const lenient: Locale = Locale.parseStrict(locale);
+				expect(lenient.toString()).toBe(locale);
+
+				const strict: Locale = Locale.parse(locale);
+				expect(strict.toString()).toBe(locale);
 			});
 		});
 	});
 
 	describe('setRegion', () => {
-		const regions = ['001', 'ar', 'AR', 'BR', 'DE', 'ES'];
+		const regions: string[] = ['001', 'ar', 'AR', 'BR', 'DE', 'ES'];
 
 		it('should append region suffix to language-only locales (es -> es-{REGION})', async () => {
 			languageLocales.forEach(locale => {
-				const l: Locale = new Locale(locale);
+				const lenient: Locale = Locale.parse(locale);
+				const strict: Locale = Locale.parseStrict(locale);
 
 				regions.forEach(region => {
 					const expectedLocale = `${locale}-${region.toUpperCase()}`;
-					expect(l.setRegion(region).toString()).toBe(expectedLocale);
+					expect(lenient.setRegion(region).toString()).toBe(expectedLocale);
+					expect(strict.setRegion(region).toString()).toBe(expectedLocale);
 				});
 			});
 		});
 
 		it('should replace region suffix of language+region locales (es-AR -> es-{REGION})', async () => {
 			languageRegionLocales.forEach(locale => {
-				const l: Locale = new Locale(locale);
+				const lenient: Locale = Locale.parse(locale);
+				const strict: Locale = Locale.parseStrict(locale);
 
 				regions.forEach(region => {
 					const localeParts = locale.split('-');
 					const language = localeParts[0];
 
 					const expectedLocale = `${language}-${region.toUpperCase()}`;
-					expect(l.setRegion(region).toString()).toBe(expectedLocale);
+					expect(lenient.setRegion(region).toString()).toBe(expectedLocale);
+					expect(strict.setRegion(region).toString()).toBe(expectedLocale);
 				});
 			});
 		});
 
 		it('should replace region suffix of language+script+region locales (pt-Latn-BR -> pt-Latn-{REGION})', async () => {
 			languageScriptRegionLocales.forEach(locale => {
-				const l: Locale = new Locale(locale);
+				const lenient: Locale = Locale.parse(locale);
+				const strict: Locale = Locale.parseStrict(locale);
 
 				regions.forEach(region => {
 					const localeParts = locale.split('-');
@@ -74,7 +108,8 @@ describe('Locale', () => {
 					const script = localeParts[1];
 
 					const expectedLocale = `${language}-${script}-${region.toUpperCase()}`;
-					expect(l.setRegion(region).toString()).toBe(expectedLocale);
+					expect(lenient.setRegion(region).toString()).toBe(expectedLocale);
+					expect(strict.setRegion(region).toString()).toBe(expectedLocale);
 				});
 			});
 		});
@@ -88,7 +123,11 @@ describe('Locale', () => {
 				...languageScriptRegionLocales,
 				...languageScriptRegionVariantsLocales
 			].forEach(locale => {
-				const l: Locale = new Locale(locale);
+				let l: Locale = Locale.parse(locale);
+				expect(l.getRegion()).not.toBeNull();
+				expect(l.getRegion() as string).toHaveLength(2);
+
+				l = Locale.parseStrict(locale);
 				expect(l.getRegion()).not.toBeNull();
 				expect(l.getRegion() as string).toHaveLength(2);
 			});
@@ -105,7 +144,10 @@ describe('Locale', () => {
 				['und-EN', 'EN']
 			].forEach(entry => {
 				const [languageTag, expectedRegion] = entry;
-				const l: Locale = new Locale(languageTag);
+				let l: Locale = Locale.parse(languageTag);
+				expect(l.getRegion()).toBe(expectedRegion);
+
+				l = Locale.parseStrict(languageTag);
 				expect(l.getRegion()).toBe(expectedRegion);
 			});
 		});
@@ -117,7 +159,10 @@ describe('Locale', () => {
 				...languageVariantLocales,
 				...languageScriptVariantLocales
 			].forEach(locale => {
-				const l: Locale = new Locale(locale);
+				let l: Locale = Locale.parse(locale);
+				expect(l.getRegion()).toBeNull();
+
+				l = Locale.parseStrict(locale);
 				expect(l.getRegion()).toBeNull();
 			});
 		});

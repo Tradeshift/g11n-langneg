@@ -13,9 +13,16 @@ Language negotiation helpers
 
 ### Usage
 
-```
-import { Locale, negotiate } from '@tradeshift/g11n-langneg'
+```typescript
+import { Locale, match } from '@tradeshift/g11n-langneg'
 
-const result: Locale = negotiate('pt-Latn-BR', ['da', 'en', 'es', 'pt'])
-// returns `new Locale('pt')`
+const result: Locale = match('pt-Latn-BR', ['da', 'en', 'es', 'pt'])
+// result == Locale.parse('pt')`
+```
+
+also accepts `Locale` objects as inputs:
+
+```typescript
+const result: Locale = match(Locale.parse('pt-Latn-BR'), [Locale.parse('da'), Locale.parse('pt')])
+// result === Locale.parse('pt')
 ```

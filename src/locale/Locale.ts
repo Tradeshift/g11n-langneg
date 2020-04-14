@@ -1,4 +1,4 @@
-import { parse, stringify } from 'bcp-47';
+import { parse as parseTag, stringify } from 'bcp-47';
 
 import { ParsedLocale } from '../types/locale';
 
@@ -56,29 +56,29 @@ export class Locale {
 		zh: 'zh-Hans-CN'
 	};
 
-	public static ROOT: Locale = new Locale(defaultLocale);
+	public static rootLocale: Locale = Locale.parse('und');
 
 	public static forLanguageTag(locale: string = defaultLocale): Locale {
-		return new Locale(locale);
+		return Locale.parse(locale);
 	}
 
-	constructor(locale: Locale);
-	constructor(locale: string);
-	constructor(locale) {
+	private constructor(locale?: Locale);
+	private constructor(locale?: string);
+	private constructor(locale?) {
 		if (locale instanceof Locale) {
 			return locale;
 		}
 
-		const defaultParsedLocale = parse(defaultLocale);
-
+		const defaultParsedLocale = parseTag(defaultLocale);
 		if (typeof locale !== 'string' || locale === '') {
 			this.locale = defaultParsedLocale;
+			this.parseError = new TypeError('Provided input type was unexpected');
 			return;
 		}
 
 		let parseError;
 		try {
-			this.locale = parse(locale, {
+			this.locale = parseTag(locale, {
 				warning: msg => {
 					parseError = msg;
 				}
@@ -92,6 +92,23 @@ export class Locale {
 			this.locale = defaultParsedLocale;
 			this.parseError = new Error(parseError);
 		}
+	}
+
+	public static parse(locale?: Locale): Locale;
+	public static parse(locale?: string): Locale;
+	public static parse(locale?): Locale {
+		return new Locale(locale);
+	}
+
+	public static parseStrict(locale?: Locale): Locale;
+	public static parseStrict(locale?: string): Locale;
+	public static parseStrict(locale?): Locale {
+		const l = new Locale(locale);
+		if (l.parseError) {
+			throw l.parseError;
+		}
+
+		return l;
 	}
 
 	public getLanguage(): string | void {
@@ -112,26 +129,19 @@ export class Locale {
 	}
 
 	public setLanguageTag(languageTag: string): Locale {
-		return new Locale(languageTag);
-	}
-
-	/**
-	 * @deprecated replaced by setRegion(region: string)
-	 */
-	public withRegion(region: string): Locale {
-		return this.setRegion(region);
+		return Locale.parse(languageTag);
 	}
 
 	public setRegion(region: string): Locale {
 		const upperRegion = region.toUpperCase();
 		this.locale.region = upperRegion;
-		return new Locale(stringify(this.locale));
+		return Locale.parse(stringify(this.locale));
 	}
 
 	public maximize(): Locale {
 		const likely = Locale.reducedLikelySubtags[stringify(this.locale).toLowerCase()];
 		if (likely) {
-			return new Locale(likely);
+			return Locale.parse(likely);
 		}
 
 		return this;

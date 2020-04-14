@@ -1,2 +1,2 @@
 export { Locale } from './locale/Locale';
-export { negotiate, negotiatePreferRegion } from './locale/LocaleMatcher';
+export { LocaleMatcher, MatchStrategy, match } from './locale/LocaleMatcher';

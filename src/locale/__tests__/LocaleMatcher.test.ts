@@ -1,124 +1,186 @@
 import { Locale } from '../Locale';
-import { negotiate, negotiatePreferRegion } from '../LocaleMatcher';
+import LocaleMatcher, { match, MatchStrategy } from '../LocaleMatcher';
 
 describe('LocaleMatcher', () => {
-	describe('negotiatePreferRegion', () => {
-		it('returns root locale in case no match is found', () => {
-			const locale = new Locale('pt');
-			const candidates = [new Locale('da'), new Locale('es')];
-			expect(negotiatePreferRegion(locale, candidates)).toEqual(Locale.ROOT);
+	describe('matchPreferRegion', () => {
+		const matcherRegion = LocaleMatcher.withStrategy(MatchStrategy.PreferRegion);
+
+		it('returns first candidate in case no match is found', () => {
+			const locale = Locale.parse('pt');
+			const candidates = [Locale.parse('da'), Locale.parse('es')];
+			expect(matcherRegion.match(locale, candidates)).toEqual(Locale.parse('da'));
+		});
+
+		it('throws error is candidate array is empty', () => {
+			const locale = Locale.parse('pt');
+			const candidates = [];
+			expect(() => matcherRegion.match(locale, candidates)).toThrow(
+				'Candidate list must not be empty'
+			);
 		});
 
 		it('finds direct matches', () => {
-			let locale = new Locale('pt');
-			let candidates = [new Locale('da'), new Locale('es'), new Locale('pt')];
-			expect(negotiatePreferRegion(locale, candidates)).toEqual(new Locale('pt'));
+			let locale = Locale.parse('pt');
+			let candidates = [Locale.parse('da'), Locale.parse('es'), Locale.parse('pt')];
+			expect(matcherRegion.match(locale, candidates)).toEqual(Locale.parse('pt'));
 
-			locale = new Locale('es');
-			candidates = [new Locale('da'), new Locale('es'), new Locale('pt')];
-			expect(negotiatePreferRegion(locale, candidates)).toEqual(new Locale('es'));
+			locale = Locale.parse('es');
+			candidates = [Locale.parse('da'), Locale.parse('es'), Locale.parse('pt')];
+			expect(matcherRegion.match(locale, candidates)).toEqual(Locale.parse('es'));
 
-			locale = new Locale('da');
-			candidates = [new Locale('da'), new Locale('es'), new Locale('pt')];
-			expect(negotiatePreferRegion(locale, candidates)).toEqual(new Locale('da'));
+			locale = Locale.parse('da');
+			candidates = [Locale.parse('da'), Locale.parse('es'), Locale.parse('pt')];
+			expect(matcherRegion.match(locale, candidates)).toEqual(Locale.parse('da'));
+
+			locale = Locale.parse('da-Latn');
+			candidates = [Locale.parse('da'), Locale.parse('da-Latn'), Locale.parse('pt')];
+			expect(matcherRegion.match(locale, candidates)).toEqual(Locale.parse('da-Latn'));
+
+			locale = Locale.parse('pt-Latn-BR');
+			candidates = [
+				Locale.parse('da'),
+				Locale.parse('da-Latn'),
+				Locale.parse('pt'),
+				Locale.parse('pt-Latn'),
+				Locale.parse('pt-Latn-BR')
+			];
+			expect(matcherRegion.match(locale, candidates)).toEqual(Locale.parse('pt-Latn-BR'));
+
+			locale = Locale.parse('pt-BR-ao1990-x-macos');
+			candidates = [
+				Locale.parse('pt'),
+				Locale.parse('pt-BR'),
+				Locale.parse('pt-BR-ao1990-x-macos'),
+				Locale.parse('pt-BR-ao1990')
+			];
+			expect(matcherRegion.match(locale, candidates)).toEqual(Locale.parse('pt-BR-ao1990-x-macos'));
 		});
 
 		it('prefers locales with more specific regions, if available', () => {
-			let locale = new Locale('und-BR');
-			let candidates = [new Locale('en-BR'), new Locale('pt')];
-			expect(negotiatePreferRegion(locale, candidates)).toEqual(new Locale('en-BR'));
+			let locale = Locale.parse('und-BR');
+			let candidates = [Locale.parse('en-BR'), Locale.parse('pt')];
+			expect(matcherRegion.match(locale, candidates)).toEqual(Locale.parse('en-BR'));
 
-			locale = new Locale('und-BR');
-			candidates = [new Locale('en'), new Locale('en-US'), new Locale('pt-Latn-BR')];
-			expect(negotiatePreferRegion(locale, candidates)).toEqual(new Locale('pt-Latn-BR'));
+			locale = Locale.parse('und-BR');
+			candidates = [Locale.parse('en'), Locale.parse('en-US'), Locale.parse('pt-Latn-BR')];
+			expect(matcherRegion.match(locale, candidates)).toEqual(Locale.parse('pt-Latn-BR'));
 
-			locale = new Locale('und-BR');
-			candidates = [new Locale('en'), new Locale('pt')];
-			expect(negotiatePreferRegion(locale, candidates)).toEqual(Locale.ROOT);
+			locale = Locale.parse('und-BR');
+			candidates = [Locale.parse('en'), Locale.parse('pt')];
+			expect(matcherRegion.match(locale, candidates)).toEqual(Locale.rootLocale);
 		});
 
 		it('also accepts plain strings as input', () => {
 			let locale = 'und-BR';
 			let candidates = ['en', 'pt-Latn-BR'];
-			expect(negotiatePreferRegion(locale, candidates)).toEqual(new Locale('pt-Latn-BR'));
+			expect(matcherRegion.match(locale, candidates)).toEqual(Locale.parse('pt-Latn-BR'));
 
 			locale = 'pt';
 			candidates = ['es', 'pt-Latn-BR'];
-			expect(negotiatePreferRegion(locale, candidates)).toEqual(new Locale('pt-Latn-BR'));
+			expect(matcherRegion.match(locale, candidates)).toEqual(Locale.parse('pt-Latn-BR'));
 		});
 	});
 
-	describe('negotiate', () => {
-		it('returns root locale in case no match is found', () => {
-			const locale = new Locale('pt');
-			const candidates = [new Locale('da'), new Locale('es')];
-			expect(negotiate(locale, candidates)).toEqual(Locale.ROOT);
+	describe('match', () => {
+		it('returns first candidate in case no match is found', () => {
+			const locale = Locale.parse('pt');
+			const candidates = [Locale.parse('da'), Locale.parse('es')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('da'));
+		});
+
+		it('throws error is candidate array is empty', () => {
+			const locale = Locale.parse('pt');
+			const candidates = [];
+			expect(() => match(locale, candidates)).toThrow('Candidate list must not be empty');
 		});
 
 		it('finds direct matches', () => {
-			let locale = new Locale('pt');
-			let candidates = [new Locale('da'), new Locale('es'), new Locale('pt')];
-			expect(negotiate(locale, candidates)).toEqual(new Locale('pt'));
+			let locale = Locale.parse('pt');
+			let candidates = [Locale.parse('da'), Locale.parse('es'), Locale.parse('pt')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('pt'));
 
-			locale = new Locale('es');
-			candidates = [new Locale('da'), new Locale('es'), new Locale('pt')];
-			expect(negotiate(locale, candidates)).toEqual(new Locale('es'));
+			locale = Locale.parse('es');
+			candidates = [Locale.parse('da'), Locale.parse('es'), Locale.parse('pt')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('es'));
 
-			locale = new Locale('da');
-			candidates = [new Locale('da'), new Locale('es'), new Locale('pt')];
-			expect(negotiate(locale, candidates)).toEqual(new Locale('da'));
+			locale = Locale.parse('da');
+			candidates = [Locale.parse('da'), Locale.parse('es'), Locale.parse('pt')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('da'));
+
+			locale = Locale.parse('da-Latn');
+			candidates = [Locale.parse('da'), Locale.parse('da-Latn'), Locale.parse('pt')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('da-Latn'));
+
+			locale = Locale.parse('pt-Latn-BR');
+			candidates = [
+				Locale.parse('da'),
+				Locale.parse('da-Latn'),
+				Locale.parse('pt'),
+				Locale.parse('pt-Latn'),
+				Locale.parse('pt-Latn-BR')
+			];
+			expect(match(locale, candidates)).toEqual(Locale.parse('pt-Latn-BR'));
+
+			locale = Locale.parse('pt-BR-ao1990-x-macos');
+			candidates = [
+				Locale.parse('pt'),
+				Locale.parse('pt-BR'),
+				Locale.parse('pt-BR-ao1990-x-macos'),
+				Locale.parse('pt-BR-ao1990')
+			];
+			expect(match(locale, candidates)).toEqual(Locale.parse('pt-BR-ao1990-x-macos'));
 		});
 
 		it('prefers more specific locales, if available', () => {
-			let locale = new Locale('pt');
-			let candidates = [new Locale('pt'), new Locale('pt-BR'), new Locale('pt-BR-ao1990')];
-			expect(negotiate(locale, candidates)).toEqual(new Locale('pt'));
+			let locale = Locale.parse('pt');
+			let candidates = [Locale.parse('pt'), Locale.parse('pt-BR'), Locale.parse('pt-BR-ao1990')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('pt'));
 
-			locale = new Locale('pt-BR');
-			candidates = [new Locale('pt'), new Locale('pt-BR'), new Locale('pt-BR-ao1990')];
-			expect(negotiate(locale, candidates)).toEqual(new Locale('pt-BR'));
+			locale = Locale.parse('pt-BR');
+			candidates = [Locale.parse('pt'), Locale.parse('pt-BR'), Locale.parse('pt-BR-ao1990')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('pt-BR'));
 
-			locale = new Locale('pt-BR-ao1990');
-			candidates = [new Locale('pt'), new Locale('pt-BR'), new Locale('pt-BR-ao1990')];
-			expect(negotiate(locale, candidates)).toEqual(new Locale('pt-BR-ao1990'));
+			locale = Locale.parse('pt-BR-ao1990');
+			candidates = [Locale.parse('pt'), Locale.parse('pt-BR'), Locale.parse('pt-BR-ao1990')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('pt-BR-ao1990'));
 
-			locale = new Locale('pt-BR-ao1990-x-macos');
-			candidates = [new Locale('pt'), new Locale('pt-BR'), new Locale('pt-BR-ao1990')];
-			expect(negotiate(locale, candidates)).toEqual(new Locale('pt-BR-ao1990'));
+			locale = Locale.parse('pt-BR-ao1990-x-macos');
+			candidates = [Locale.parse('pt'), Locale.parse('pt-BR'), Locale.parse('pt-BR-ao1990')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('pt-BR-ao1990'));
 		});
 
 		it('matches available maximized versions (direct matches preferred)', () => {
-			let locale = new Locale('zh');
-			let candidates = [new Locale('zh-Hans-CN')];
-			expect(negotiate(locale, candidates)).toEqual(new Locale('zh-Hans-CN'));
+			let locale = Locale.parse('zh');
+			let candidates = [Locale.parse('zh-Hans-CN')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('zh-Hans-CN'));
 
-			locale = new Locale('zh'); // direct match will be preferred
-			candidates = [new Locale('zh-Hans-CN'), new Locale('zh')];
-			expect(negotiate(locale, candidates)).toEqual(new Locale('zh'));
+			locale = Locale.parse('zh'); // direct match will be preferred
+			candidates = [Locale.parse('zh-Hans-CN'), Locale.parse('zh')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('zh'));
 
-			locale = new Locale('pt');
-			candidates = [new Locale('pt-Latn'), new Locale('pt-Latn-BR')];
-			expect(negotiate(locale, candidates)).toEqual(new Locale('pt-Latn-BR'));
+			locale = Locale.parse('pt');
+			candidates = [Locale.parse('pt-Latn'), Locale.parse('pt-Latn-BR')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('pt-Latn-BR'));
 		});
 
 		it('handles language tags with variants and extensions', () => {
-			let locale = new Locale('pt-BR-ao1990');
-			let candidates = [new Locale('da'), new Locale('es'), new Locale('pt')];
-			expect(negotiate(locale, candidates)).toEqual(new Locale('pt'));
+			let locale = Locale.parse('pt-BR-ao1990');
+			let candidates = [Locale.parse('da'), Locale.parse('es'), Locale.parse('pt')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('pt'));
 
-			locale = new Locale('en-DE-u-co-phonebk');
-			candidates = [new Locale('es'), new Locale('da'), new Locale('en')];
-			expect(negotiate(locale, candidates)).toEqual(new Locale('en'));
+			locale = Locale.parse('en-DE-u-co-phonebk');
+			candidates = [Locale.parse('es'), Locale.parse('da'), Locale.parse('en')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('en'));
 		});
 
 		it('also accepts plain strings as input', () => {
 			let locale = 'pt';
 			let candidates = ['da', 'es', 'pt'];
-			expect(negotiate(locale, candidates)).toEqual(new Locale('pt'));
+			expect(match(locale, candidates)).toEqual(Locale.parse('pt'));
 
 			locale = 'pt';
 			candidates = ['es', 'pt-Latn-BR'];
-			expect(negotiate(locale, candidates)).toEqual(new Locale('pt-Latn-BR'));
+			expect(match(locale, candidates)).toEqual(Locale.parse('pt-Latn-BR'));
 		});
 	});
 });
