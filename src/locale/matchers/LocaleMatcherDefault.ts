@@ -18,7 +18,7 @@ class LocaleMatcherDefault implements Matcher {
 		key = Locale.parse(key);
 		candidates = candidates.map(c => Locale.parse(c));
 
-		const candidatesWithDefault = [...candidates, Locale.rootLocale];
+		const candidatesWithDefault = [...candidates, Locale.ROOT];
 		const everyKey = LocaleMatcherDefault.getSplitLocales([key]);
 
 		for (const currentKey of everyKey) {

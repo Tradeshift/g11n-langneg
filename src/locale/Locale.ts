@@ -56,7 +56,7 @@ export class Locale {
 		zh: 'zh-Hans-CN'
 	};
 
-	public static rootLocale: Locale = Locale.parse('und');
+	public static ROOT: Locale = Locale.parse('und');
 
 	public static forLanguageTag(locale: string = defaultLocale): Locale {
 		return Locale.parse(locale);

@@ -24,7 +24,7 @@ class LocaleMatcherPreferRegion implements Matcher {
 			LocaleMatcherPreferRegion.getRegionMatch(key, candidates),
 			// in case it did not find a match by region (getRegionMatch)
 			// and the language part of the input is 'und',
-			// the best locale will certainly be Locale.rootLocale.
+			// the best locale will certainly be Locale.ROOT.
 			//
 			// Otherwise it could match, with 'getLanguageMatch',
 			// another label with the language part 'und' but with a more specific region,
@@ -72,8 +72,8 @@ class LocaleMatcherPreferRegion implements Matcher {
 	}
 
 	private static getRootLanguageMatch(input: Locale): Locale {
-		if (input.getLanguage() === Locale.rootLocale.getLanguage()) {
-			return Locale.rootLocale;
+		if (input.getLanguage() === Locale.ROOT.getLanguage()) {
+			return Locale.ROOT;
 		}
 
 		return null;

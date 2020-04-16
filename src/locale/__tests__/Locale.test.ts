@@ -27,7 +27,7 @@ describe('Locale', () => {
 				expect(() => Locale.parseStrict(tag)).toThrow('Found superfluous content after tag');
 
 				expect(() => Locale.parse(tag)).not.toThrow();
-				expect(Locale.parse(tag).toString()).toBe(Locale.rootLocale.toString());
+				expect(Locale.parse(tag).toString()).toBe(Locale.ROOT.toString());
 			});
 		});
 
@@ -38,7 +38,7 @@ describe('Locale', () => {
 				);
 
 				expect(() => Locale.parse(tag)).not.toThrow();
-				expect(Locale.parse(tag).toString()).toBe(Locale.rootLocale.toString());
+				expect(Locale.parse(tag).toString()).toBe(Locale.ROOT.toString());
 			});
 		});
 
@@ -49,7 +49,7 @@ describe('Locale', () => {
 				);
 
 				expect(() => Locale.parse(tag)).not.toThrow();
-				expect(Locale.parse(tag).toString()).toBe(Locale.rootLocale.toString());
+				expect(Locale.parse(tag).toString()).toBe(Locale.ROOT.toString());
 			});
 		});
 	});

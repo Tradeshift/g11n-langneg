@@ -67,7 +67,7 @@ describe('LocaleMatcher', () => {
 
 			locale = Locale.parse('und-BR');
 			candidates = [Locale.parse('en'), Locale.parse('pt')];
-			expect(matcherRegion.match(locale, candidates)).toEqual(Locale.rootLocale);
+			expect(matcherRegion.match(locale, candidates)).toEqual(Locale.ROOT);
 		});
 
 		it('also accepts plain strings as input', () => {
