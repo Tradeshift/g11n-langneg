@@ -53,6 +53,29 @@ describe('Locale', () => {
 			});
 		});
 	});
+
+	describe('normalization', () => {
+		it('normalizes case of each subtag when parsing', () => {
+			[
+				['UND', 'und'],
+				['pT', 'pt'],
+				['en-us', 'en-US'],
+				['UND-DE', 'und-DE'],
+				['en-latn-macos', 'en-Latn-macos'],
+				['pt-br-AO1990', 'pt-BR-ao1990'],
+				['ES-LATN-ar', 'es-Latn-AR'],
+				['pt-BR-U-fw-mon', 'pt-BR-u-fw-mon']
+			].forEach(entry => {
+				const [languageTag, normalized] = entry;
+				let l: Locale = Locale.parse(languageTag);
+				expect(l.toString()).toBe(normalized);
+
+				l = Locale.parseStrict(languageTag);
+				expect(l.toString()).toBe(normalized);
+			});
+		});
+	});
+
 	describe('toString()', () => {
 		it('parsing stringifies to input locale', async () => {
 			everyLocale.forEach(locale => {

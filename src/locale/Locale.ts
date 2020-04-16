@@ -78,11 +78,13 @@ export class Locale {
 
 		let parseError;
 		try {
-			this.locale = parseTag(locale, {
+			const parsed = parseTag(locale.toLowerCase(), {
 				warning: msg => {
 					parseError = msg;
 				}
 			});
+
+			this.locale = this.normalize(parsed);
 		} catch (e) {
 			this.locale = defaultParsedLocale;
 			this.parseError = e;
@@ -153,5 +155,29 @@ export class Locale {
 
 	public toString(): string {
 		return stringify(this.locale);
+	}
+
+	/**
+	 * Normalizes a parsed locale structure to the
+	 * expected casing according to BCP-47.
+	 *
+	 * Expects ParsedLocale with all parts in lowercase.
+	 *
+	 * E.g.:
+	 * - en-us -> un-US
+	 * - pt-latn-br -> pt-Latn-BR
+	 *
+	 * @param parsed
+	 */
+	private normalize(parsed: ParsedLocale): ParsedLocale {
+		if (parsed.script) {
+			parsed.script = parsed.script.charAt(0).toUpperCase() + parsed.script.slice(1);
+		}
+
+		if (parsed.region) {
+			parsed.region = parsed.region.toUpperCase();
+		}
+
+		return parsed;
 	}
 }
