@@ -2,7 +2,7 @@
 	"name": "@tradeshift/g11n-langneg",
 	"version": "0.0.1",
 	"description": "Language negotiation for the masses",
-	"main": "index.js",
+	"main": "dist/es/index.js",
 	"scripts": {
 		"prepublish": "npm run validate",
 		"after-success": "tradeshift-scripts travis-after-success",
