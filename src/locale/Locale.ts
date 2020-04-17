@@ -81,7 +81,7 @@ export class Locale {
 
 		let parseError;
 		try {
-			const parsed = parseTag(locale.toLowerCase(), {
+			const parsed = parseTag(locale.toLowerCase().replace(/_/g, '-'), {
 				warning: msg => {
 					parseError = msg;
 				}

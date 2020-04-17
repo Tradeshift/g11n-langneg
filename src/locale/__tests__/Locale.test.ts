@@ -60,8 +60,10 @@ describe('Locale', () => {
 				['UND', 'und'],
 				['pT', 'pt'],
 				['en-us', 'en-US'],
+				['en_us', 'en-US'],
 				['UND-DE', 'und-DE'],
 				['en-latn-macos', 'en-Latn-macos'],
+				['en_latn_macos', 'en-Latn-macos'],
 				['pt-br-AO1990', 'pt-BR-ao1990'],
 				['ES-LATN-ar', 'es-Latn-AR'],
 				['pt-BR-U-fw-mon', 'pt-BR-u-fw-mon']
