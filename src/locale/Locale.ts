@@ -133,6 +133,15 @@ export class Locale {
 		return this.locale.region ?? null;
 	}
 
+	public getScript(): string | void {
+		if (!this.locale) {
+			return null;
+		}
+
+		const { script } = this.locale;
+		return script ?? null;
+	}
+
 	public setLanguageTag(languageTag: string): Locale {
 		return Locale.parse(languageTag);
 	}

@@ -190,4 +190,26 @@ describe('Locale', () => {
 			});
 		});
 	});
+
+	describe('getScript()', () => {
+		it('hand-picked locales should return expected script', async () => {
+			[
+				['en-Latn-macos', 'Latn'],
+				['es-Latn-AR', 'Latn'],
+				['ru-Cyrl-RU', 'Cyrl'],
+				['ru-Cyrl', 'Cyrl'],
+				['pt-BR-ao1990', null],
+				['pt-BR-u-fw-mon', null],
+				['pt-PT', null],
+				['und-EN', null]
+			].forEach(entry => {
+				const [languageTag, expectedScript] = entry;
+				let l: Locale = Locale.parse(languageTag);
+				expect(l.getScript()).toBe(expectedScript);
+
+				l = Locale.parseStrict(languageTag);
+				expect(l.getScript()).toBe(expectedScript);
+			});
+		});
+	});
 });
