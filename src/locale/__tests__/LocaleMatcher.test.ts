@@ -161,6 +161,14 @@ describe('LocaleMatcher', () => {
 			locale = Locale.parse('pt');
 			candidates = [Locale.parse('pt-Latn'), Locale.parse('pt-Latn-BR')];
 			expect(match(locale, candidates)).toEqual(Locale.parse('pt-Latn-BR'));
+
+			locale = Locale.parse('sr-RS');
+			candidates = [Locale.parse('sr-Cyrl-RS'), Locale.parse('pt-BR')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('sr-Cyrl-RS'));
+
+			locale = Locale.parse('sr-RS');
+			candidates = [Locale.parse('sr-Cyrl'), Locale.parse('pt-BR')];
+			expect(match(locale, candidates)).toEqual(Locale.parse('sr-Cyrl'));
 		});
 
 		it('handles language tags with variants and extensions', () => {
