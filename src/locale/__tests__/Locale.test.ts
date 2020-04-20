@@ -21,6 +21,34 @@ describe('Locale', () => {
 		...languageVariantLocales
 	];
 
+	describe('maximize', () => {
+		it('maximizes locales', () => {
+			[
+				['pt', 'pt-Latn-BR'],
+				['pt-Latn', 'pt-Latn-BR'],
+				['pt-BR', 'pt-Latn-BR'],
+				['pt-Latn-BR', 'pt-Latn-BR'],
+				// variants and extensions are kept
+				['pt-BR-ao1990', 'pt-Latn-BR-ao1990'],
+				['pt-Latn-BR-ao1990', 'pt-Latn-BR-ao1990'],
+				['pt-BR-u-fw-mon', 'pt-Latn-BR-u-fw-mon'],
+				['pt-BR-ao1990-x-macos', 'pt-Latn-BR-ao1990-x-macos'],
+				// script but no country
+				['zh-Hans', 'zh-Hans-CN'],
+				['zh-Hant', 'zh-Hant-TW'],
+				// should add script 'Latn' to no-match, if script not present
+				['xx', 'xx-Latn'],
+				['xx-BR', 'xx-Latn-BR'],
+				['xx-Cyrl', 'xx-Cyrl']
+			].forEach(expectation => {
+				const [input, maximized] = expectation;
+
+				const locale = Locale.parse(input);
+				expect(locale.maximize().toString()).toBe(maximized);
+			});
+		});
+	});
+
 	describe('parsing (strict and lenient)', () => {
 		it('superfluous content tags (throws error on strict mode)', () => {
 			['xx-YY-w-ZZZZZ---', 'aa---BB', 'aa-BB-!'].forEach(tag => {
@@ -135,6 +163,53 @@ describe('Locale', () => {
 					const expectedLocale = `${language}-${script}-${region.toUpperCase()}`;
 					expect(lenient.setRegion(region).toString()).toBe(expectedLocale);
 					expect(strict.setRegion(region).toString()).toBe(expectedLocale);
+				});
+			});
+		});
+	});
+
+	describe('setScript', () => {
+		const scripts: string[] = ['Latn', 'LATN', 'latn', 'Cyrl', 'Hans', 'Hant'];
+
+		it('should append script subtag to language-only locales (es -> es-{SCRIPT})', async () => {
+			languageLocales.forEach(locale => {
+				const lenient: Locale = Locale.parse(locale);
+				const strict: Locale = Locale.parseStrict(locale);
+
+				scripts.forEach(script => {
+					const capitalizedScript = script.charAt(0).toUpperCase() + script.slice(1).toLowerCase();
+					const expectedLocale = `${strict.getLanguage()}-${capitalizedScript}`;
+					expect(lenient.setScript(script).toString()).toBe(expectedLocale);
+					expect(strict.setScript(script).toString()).toBe(expectedLocale);
+				});
+			});
+		});
+
+		it('should replace script subtag of language+region locales (es-AR -> es-{SCRIPT}-AR)', async () => {
+			languageRegionLocales.forEach(locale => {
+				const lenient: Locale = Locale.parse(locale);
+				const strict: Locale = Locale.parseStrict(locale);
+
+				scripts.forEach(script => {
+					const capitalizedScript = script.charAt(0).toUpperCase() + script.slice(1).toLowerCase();
+
+					const expectedLocale = `${strict.getLanguage()}-${capitalizedScript}-${strict.getRegion()}`;
+					expect(lenient.setScript(script).toString()).toBe(expectedLocale);
+					expect(strict.setScript(script).toString()).toBe(expectedLocale);
+				});
+			});
+		});
+
+		it('should replace script subtag of language+script+region locales (pt-Latn-BR -> pt-{SCRIPT}-BR)', async () => {
+			languageScriptRegionLocales.forEach(locale => {
+				const lenient: Locale = Locale.parse(locale);
+				const strict: Locale = Locale.parseStrict(locale);
+
+				scripts.forEach(script => {
+					const capitalizedScript = script.charAt(0).toUpperCase() + script.slice(1).toLowerCase();
+					const expectedLocale = `${strict.getLanguage()}-${capitalizedScript}-${strict.getRegion()}`;
+					expect(lenient.setScript(script).toString()).toBe(expectedLocale);
+					expect(strict.setScript(script).toString()).toBe(expectedLocale);
 				});
 			});
 		});

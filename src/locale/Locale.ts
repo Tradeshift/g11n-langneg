@@ -152,13 +152,81 @@ export class Locale {
 		return Locale.parse(stringify(this.locale));
 	}
 
+	public setScript(script: string): Locale {
+		script = script.toLowerCase();
+		this.locale.script = script.charAt(0).toUpperCase() + script.slice(1);
+		return Locale.parse(stringify(this.locale));
+	}
+
 	public maximize(): Locale {
-		const likely = Locale.reducedLikelySubtags[stringify(this.locale).toLowerCase()];
+		if (this.getScript() && this.getRegion()) {
+			// short circuit, already maximized
+			return this;
+		}
+
+		const likely =
+			this.maximizeLanguageRegion() ?? this.maximizeLanguageScript() ?? this.maximizeLanguage();
+
+		if (likely) {
+			let maximized: Locale = Locale.parse(this.toString());
+			const region = likely.getRegion();
+			const script = likely.getScript();
+
+			if (!this.getRegion() && region) {
+				maximized = maximized.setRegion(region);
+			}
+
+			if (!this.getScript() && script) {
+				maximized = maximized.setScript(script);
+			}
+
+			return maximized;
+		}
+
+		if (!this.getScript()) {
+			return this.setScript('Latn');
+		}
+
+		return this;
+	}
+
+	private maximizeLanguageRegion(): Locale {
+		if (!this.getRegion()) {
+			return null;
+		}
+
+		const localeString = `${this.getLanguage()}-${this.getRegion()}`;
+		const likely = Locale.reducedLikelySubtags[(localeString as string).toLowerCase()];
 		if (likely) {
 			return Locale.parse(likely);
 		}
 
-		return this;
+		return null;
+	}
+
+	private maximizeLanguageScript(): Locale {
+		if (!this.getScript()) {
+			return null;
+		}
+
+		const localeString = `${this.getLanguage()}-${this.getScript()}`;
+		const likely = Locale.reducedLikelySubtags[(localeString as string).toLowerCase()];
+		if (likely) {
+			return Locale.parse(likely);
+		}
+
+		return null;
+	}
+
+	private maximizeLanguage(): Locale {
+		const localeString = this.getLanguage();
+
+		const likely = Locale.reducedLikelySubtags[(localeString as string).toLowerCase()];
+		if (likely) {
+			return Locale.parse(likely);
+		}
+
+		return null;
 	}
 
 	public hasParseError(): boolean {
