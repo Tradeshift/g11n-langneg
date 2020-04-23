@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"allowJs": true,
 		"allowSyntheticDefaultImports": true,
 		"declaration": true,
 		"declarationDir": "dist/types",
@@ -12,8 +13,8 @@
 		"outDir": "dist/es",
 		"sourceMap": true,
 		"strict": false,
-		"target": "es5",
-		"allowJs": true
+		"target": "es5"
 	},
-	"include": ["src"]
+	"include": ["src"],
+	"exclude": ["src/**/__tests__/*", "src/types/globals.ts", "src/setupTests.ts"]
 }
