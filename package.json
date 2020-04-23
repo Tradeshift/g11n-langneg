@@ -6,7 +6,7 @@
 	"scripts": {
 		"prepublish": "npm run validate",
 		"after-success": "tradeshift-scripts travis-after-success",
-		"build": "tsc --downlevelIteration",
+		"build": "rm -rf ./dist && tsc --downlevelIteration",
 		"format": "tradeshift-scripts format",
 		"lint": "tradeshift-scripts lint",
 		"precommit": "tradeshift-scripts precommit",
