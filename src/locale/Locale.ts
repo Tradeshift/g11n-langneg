@@ -9,15 +9,9 @@ export class Locale {
 	readonly parseError: Error;
 
 	/**
-	 * This is a manually crafted list of likely subtags corresponding
-	 * to the Unicode CLDR likelySubtags dataset.
-	 *
-	 * This list is curated by the Tradeshift Globalization Team and is
-	 * intended to be used in place of the full likelySubtags list in use cases
-	 * where full list cannot be (for example, due to the size).
-	 *
-	 * This version of the list is based on CLDR 36:
-	 * https://github.com/unicode-cldr/cldr-core/blob/master/supplemental/likelySubtags.json
+	 * A subset of the CLDR Likely Subtags data,
+	 * giving preference to most common locales with
+	 * the intent of reducing lib size.
 	 */
 	private static readonly reducedLikelySubtags: {} = {
 		ar: 'ar-Arab-EG',
