@@ -67,10 +67,11 @@ class LocaleMatcherDefault implements Matcher {
 		});
 
 		const converted = candidates
+			.filter((el, i, a) => i === a.indexOf(el)) // deduplicate
 			.map(candidate => Locale.parse(candidate))
 			.filter(l => !l.hasParseError());
 
-		return Array.from(new Set(converted));
+		return converted;
 	}
 }
 
