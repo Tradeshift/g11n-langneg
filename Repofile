@@ -1,6 +1,6 @@
 {
     "description": "Language negotiation helpers",
     "enableIssues": true,
-    "maintainers": ["Globalization", "Frontenders"],
+    "maintainers": ["Globalization", "Frontenders", "DocsAPI"],
     "topics": ["globalization", "locale", "bcp-47", "language-negotiation"]
 }
