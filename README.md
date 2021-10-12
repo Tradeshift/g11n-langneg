@@ -10,6 +10,12 @@
 
 Language negotiation helpers
 
+## release
+
+Semantic release: (Commit conventions)
+
+No new version will be released unless specific commit message is used. See [Commit conventions](https://github.com/conventional-changelog-archived-repos/conventional-changelog-angular/blob/master/convention.md) for details.
+If a release is expected, please fix commit messages to align with appropriate format
 
 ### Language negotiation usage
 
@@ -31,7 +37,7 @@ const result: Locale = match('pt', ['en', 'da', 'es'])
 // result == Locale.parse('en')`
 ```
 
-### Locale 
+### Locale
 
 #### Parsing (strict and lenient)
 
