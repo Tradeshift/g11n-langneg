@@ -1,0 +1,65 @@
+name: npm publish
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  pr_commented:
+    # This job only runs for pull request comments
+    name: PR comment
+    if: github.event.comment.body == 'npm publish'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 👍 Acknowledge
+        uses: actions/github-script@0.3.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { issue: { number: issue_number }, repo: { owner, repo }, payload  } = context;
+            github.reactions.createForIssueComment({
+              owner,
+              repo,
+              comment_id: payload.comment.id,
+              content: '+1',
+            });
+
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v2
+      - name: ⬇️ Checkout PR
+        run: |
+          git fetch origin pull/${{ github.event.issue.number }}/head:pr-find-commit
+          git checkout pr-find-commit
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+          registry-url: 'https://npm.pkg.github.com/'
+          cache: 'npm'
+
+      - name: 📥 Download deps
+        run: npm install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: 🏗 Run build script
+        run: npm run --if-present build
+
+      - name: 📦 Set pre-release version
+        run: npm version --no-git-tag-version 0.0.0-$(git rev-parse HEAD)
+
+      - name: 🚀 Release
+        run: npm publish --tag=pre
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 'Comment PR'
+        uses: actions/github-script@0.3.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
+            const { name: packageName, version } = require(`${process.env.GITHUB_WORKSPACE}/package.json`);
+            const body = `Pre-release of \`${packageName}\` successfully published :rocket:\n\n` +
+              `\`\`\`\nnpm install ${packageName}@${version}\n\`\`\`\n\n` +
+              "Happy testing :tophat:";
+            github.issues.createComment({ issue_number, owner, repo, body });
