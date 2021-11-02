@@ -5,6 +5,8 @@
 	"license": "MIT",
 	"main": "dist/es/index.js",
 	"scripts": {
+		"clean": "rm -rf .cache-loader .cache build node_modules/.cache",
+		"build-local": "npx npm-force-resolutions && npm install",
 		"prepublish": "npm run validate",
 		"after-success": "tradeshift-scripts travis-after-success",
 		"build": "rm -rf ./dist && tsc --downlevelIteration",
@@ -31,9 +33,9 @@
 	},
 	"homepage": "https://github.com/Tradeshift/g11n-langneg#readme",
 	"devDependencies": {
-		"@types/jest": "^24.0.25",
+		"@types/jest": "^27.0.1",
 		"cz-conventional-changelog": "^3.0.2",
-		"tradeshift-scripts": "^3.0.5",
+		"tradeshift-scripts": "^4.0.1",
 		"typescript": "^3.7.4"
 	},
 	"config": {
@@ -45,6 +47,6 @@
 		"bcp-47": "^1.0.7"
 	},
 	"resolutions": {
-		"set-value": "^4.0.1"
+		"ansi-regex": "^5.0.1"
 	}
 }
