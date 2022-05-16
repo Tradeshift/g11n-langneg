@@ -1,6 +1,18 @@
 {
-    "description": "Language negotiation helpers",
-    "enableIssues": true,
-    "maintainers": ["Globalization", "Frontenders", "DocsAPI"],
-    "topics": ["globalization", "locale", "bcp-47", "language-negotiation"]
+  "description": "Language negotiation helpers",
+  "enableIssues": true,
+  "maintainers": [
+    "Globalization",
+    "Frontenders",
+    "DocsAPI"
+  ],
+  "topics": [
+    "globalization",
+    "locale",
+    "bcp-47",
+    "language-negotiation"
+  ],
+  "checks": [
+    "npm test (16)"
+  ]
 }
