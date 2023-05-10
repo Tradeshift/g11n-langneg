@@ -6,10 +6,10 @@ on:
       - master
 
 jobs:
-  build:
+  sonar:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: fetching
         if: contains(github.ref, 'pull')
         run: |
@@ -22,4 +22,3 @@ jobs:
           client-cert: ${{ secrets.MTLS_CERT }}
           client-key: ${{ secrets.MTLS_KEY }}
           token: ${{ secrets.SONAR_TOKEN }}
-          host: "https://sonar.ts.sv"
