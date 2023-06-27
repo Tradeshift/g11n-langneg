@@ -1,16 +1,23 @@
 name: Sonarqube scanner
+
 on:
   pull_request:
   push:
     branches:
       - master
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  sonar:
+    runs-on: [self-hosted, ts-large-x64-docker-large]
+
     steps:
-      - uses: actions/checkout@v2
-      - name: fetching
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v3
+      - name: Fetch PR
         if: contains(github.ref, 'pull')
         run: |
           git fetch origin ${{ github.event.pull_request.head.sha }}
