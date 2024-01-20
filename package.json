@@ -48,7 +48,7 @@
 		"bcp-47": "^1.0.7"
 	},
 	"resolutions": {
-		"ansi-regex": "^5.0.1",
+		"ansi-regex": "^6.0.0",
 		"minimist": "^1.2.6"
 	}
 }
