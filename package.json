@@ -45,7 +45,7 @@
 		}
 	},
 	"dependencies": {
-		"bcp-47": "^1.0.7"
+		"bcp-47": "^2.1.0"
 	},
 	"resolutions": {
 		"ansi-regex": "^5.0.1",
