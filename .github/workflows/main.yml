@@ -65,7 +65,7 @@ jobs:
         run: npm run --if-present build
 
       - name: 🚀 Release (github registry)
-        uses: tradeshift/actions-semantic-release@v1
+        uses: tradeshift/actions-semantic-release@v2
         id: semantic-release
         with:
           registry: https://npm.pkg.github.com/
