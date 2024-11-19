@@ -33,7 +33,7 @@
 	},
 	"homepage": "https://github.com/Tradeshift/g11n-langneg#readme",
 	"devDependencies": {
-		"@types/jest": "^27.0.1",
+		"@types/jest": "^27.5.2",
 		"@types/prettier": "2.6.0",
 		"cz-conventional-changelog": "^3.3.0",
 		"tradeshift-scripts": "^4.0.7",
