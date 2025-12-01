@@ -36,7 +36,7 @@
 		"@types/jest": "^27.5.2",
 		"@types/prettier": "2.6.0",
 		"cz-conventional-changelog": "^3.3.0",
-		"tradeshift-scripts": "^4.0.7",
+		"tradeshift-scripts": "^6.0.46",
 		"typescript": "^3.9.10"
 	},
 	"config": {
