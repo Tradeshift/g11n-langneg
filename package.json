@@ -37,7 +37,7 @@
 		"@types/prettier": "2.6.0",
 		"cz-conventional-changelog": "^3.3.0",
 		"tradeshift-scripts": "^4.0.7",
-		"typescript": "^3.9.10"
+		"typescript": "^5.6.3"
 	},
 	"config": {
 		"commitizen": {
